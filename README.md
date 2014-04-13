@@ -18,7 +18,7 @@ At the moment there is no packaged download or binaries. If you wish to try Trac
 
 Requirements
 ------------
-In order to run this program from you will need to have the following installed:
+In order to run this program from source you will need to have the following installed:
 * Python 2.7
 * wxPython
 * Beautiful Soup
