@@ -124,7 +124,7 @@ class ListTeams(wx.Panel):
         return list_bottom
 
     def set_scroll_pos(self, pos):
-        self.list.EnsureVisible((pos - 2))
+        self.list.EnsureVisible((pos - 1))
 
 
 class ListGames(wx.Panel):
@@ -217,6 +217,6 @@ class ListGames(wx.Panel):
         return list_bottom
 
     def set_scroll_pos(self, pos):
-        self.list.EnsureVisible((pos - 2))
+        self.list.EnsureVisible((pos - 1))
 
 
