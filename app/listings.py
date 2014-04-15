@@ -30,13 +30,19 @@ class AutoWidthListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
         return indices
 
 
-def list_refresh(function, interval):
-    previous_time = time.clock()
-    while True:
-        current_time = time.clock()
-        if current_time - previous_time > interval:
-            function()
-            previous_time = time.clock()
+
+
+
+def list_refresh(function, interval=None, *args):
+    if interval is not None:
+        previous_time = time.clock()
+        while True:
+            current_time = time.clock()
+            if current_time - previous_time > interval:
+                function(*args)
+                previous_time = time.clock()
+    else:
+        function(*args)
 
 
 class ListTeams(wx.Panel):
@@ -63,6 +69,7 @@ class ListTeams(wx.Panel):
         self.list.Show(True)
 
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select, self.list)
+        self.list.Bind(wx.EVT_KEY_UP, self.on_key_up)
 
         self.sizer.Add(self.list, 1, wx.ALL | wx.EXPAND)
         self.SetSizer(self.sizer)
@@ -116,12 +123,16 @@ class ListTeams(wx.Panel):
 
                 self.list.SetStringItem(pos, 4, string)
 
-
             # Have to set width after items have been added
             self.list.SetColumnWidth(1, wx.LIST_AUTOSIZE_USEHEADER)
             self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
             self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
             self.sizer.RecalcSizes()
+
+        else:
+            pos = self.list.InsertStringItem(0, "")
+            self.list.SetStringItem(pos, 3, "Finding Teams")
+            self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
     def on_open(self):
         self.populate_list()
@@ -139,6 +150,12 @@ class ListTeams(wx.Panel):
 
     def set_scroll_pos(self, pos):
         self.list.EnsureVisible((pos - 1))
+
+    def on_key_up(self, event):
+        if event.GetKeyCode() == wx.WXK_F5:
+            print "Refreshing"
+            self.on_open()
+            self.parent.SendPageChangedEvent(0)
 
 
 class ListGames(wx.Panel):
@@ -163,6 +180,7 @@ class ListGames(wx.Panel):
         self.list.Show(True)
 
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select, self.list)
+        self.list.Bind(wx.EVT_KEY_UP, self.on_key_up)
 
         self.sizer.Add(self.list, 1, wx.ALL | wx.EXPAND)
         self.SetSizer(self.sizer)
@@ -192,7 +210,6 @@ class ListGames(wx.Panel):
             self.game_list.sort(key=operator.itemgetter('position'))
             self.game_list.reverse()
 
-
             for game in self.game_list:
                 pinned = ""
 
@@ -218,8 +235,10 @@ class ListGames(wx.Panel):
             self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
             self.sizer.RecalcSizes()
 
-
-
+        else:
+            pos = self.list.InsertStringItem(0, "")
+            self.list.SetStringItem(pos, 2, "Finding Games")
+            self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
 
     def on_open(self):
         self.populate_list()
@@ -237,5 +256,17 @@ class ListGames(wx.Panel):
 
     def set_scroll_pos(self, pos):
         self.list.EnsureVisible((pos - 1))
+
+    def on_key_up(self, event):
+        if event.GetKeyCode() == wx.WXK_F5:
+            threading.Thread(target=self.refresh_games).start()
+
+    def refresh_games(self):
+        print "Refreshing Games"
+        self.game_list = []
+        gosuapi.get_games(self.team_list, self.game_list)
+        self.populate_list()
+        self.parent.SendPageChangedEvent(0)
+        print "Refreshed Games"
 
 

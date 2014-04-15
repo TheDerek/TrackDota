@@ -34,10 +34,16 @@ if __name__ == "__main__":
 
 
     nb = wx.Notebook(frame)
-    nb.AddPage(listings.ListTeams(nb, teams, games, pinned_teams), "All Teams")
-    nb.AddPage(listings.ListTeams(nb, pinned_teams, games, pinned_teams), "Pinned Teams")
-    nb.AddPage(listings.ListGames(nb, teams, games, pinned_games, pinned_teams), "Games")
-    nb.AddPage(listings.ListGames(nb, teams, pinned_games, pinned_games, pinned_teams), "Pinned Games")
+    list_teams = listings.ListTeams(nb, teams, games, pinned_teams)
+    list_pinned_teams = listings.ListTeams(nb, pinned_teams, games, pinned_teams)
+    list_games = listings.ListGames(nb, teams, games, pinned_games, pinned_teams)
+    list_pinned_games = listings.ListGames(nb, teams, pinned_games, pinned_games, pinned_teams)
+    nb.AddPage(list_teams, "All Teams")
+    nb.AddPage(list_pinned_teams, "Pinned Teams")
+    nb.AddPage(list_games, "Games")
+    nb.AddPage(list_pinned_games, "Pinned Games")
+
+
 
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, on_open)
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, on_exit)
