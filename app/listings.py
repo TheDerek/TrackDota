@@ -188,8 +188,10 @@ class ListGames(wx.Panel):
 
         if len(self.game_list) > 0:
             #self.pinned_games.sort(key=operator.itemgetter('rank'))
-            #self.game_list.reverse()
-            #self.pinned_teams.reverse()
+
+            self.game_list.sort(key=operator.itemgetter('position'))
+            self.game_list.reverse()
+
 
             for game in self.game_list:
                 pinned = ""
@@ -215,6 +217,9 @@ class ListGames(wx.Panel):
             self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
             self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
             self.sizer.RecalcSizes()
+
+
+
 
     def on_open(self):
         self.populate_list()
