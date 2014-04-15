@@ -30,9 +30,6 @@ class AutoWidthListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
         return indices
 
 
-
-
-
 def list_refresh(function, interval=None, *args):
     if interval is not None:
         previous_time = time.clock()
@@ -69,7 +66,7 @@ class ListTeams(wx.Panel):
         self.list.Show(True)
 
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select, self.list)
-        self.list.Bind(wx.EVT_KEY_UP, self.on_key_up)
+        self.list.Bind(wx.EVT_KEY_UP, self.refresh_data)
 
         self.sizer.Add(self.list, 1, wx.ALL | wx.EXPAND)
         self.SetSizer(self.sizer)
@@ -135,7 +132,7 @@ class ListTeams(wx.Panel):
             self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
     def on_open(self):
-        self.populate_list()
+        #self.populate_list()
         self.set_scroll_pos(self.scroll_position)
 
     def on_exit(self):
@@ -151,11 +148,10 @@ class ListTeams(wx.Panel):
     def set_scroll_pos(self, pos):
         self.list.EnsureVisible((pos - 1))
 
-    def on_key_up(self, event):
-        if event.GetKeyCode() == wx.WXK_F5:
+    def refresh_data(self):
             print "Refreshing"
-            self.on_open()
-            self.parent.SendPageChangedEvent(0)
+            wx.CallAfter(self.populate_list)
+            wx.CallAfter(self.parent.SendPageChangedEvent, 0)
 
 
 class ListGames(wx.Panel):
@@ -241,7 +237,7 @@ class ListGames(wx.Panel):
             self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
 
     def on_open(self):
-        self.populate_list()
+        #self.populate_list()
         self.set_scroll_pos(self.scroll_position)
 
     def on_exit(self):
@@ -261,12 +257,13 @@ class ListGames(wx.Panel):
         if event.GetKeyCode() == wx.WXK_F5:
             threading.Thread(target=self.refresh_games).start()
 
-    def refresh_games(self):
+    def refresh_data(self):
         print "Refreshing Games"
-        self.game_list = []
+        del self.game_list[0:len(self.game_list)]
+
         gosuapi.get_games(self.team_list, self.game_list)
-        self.populate_list()
-        self.parent.SendPageChangedEvent(0)
+        wx.CallAfter(self.populate_list)
+        wx.CallAfter(self.parent.SendPageChangedEvent, 0)
         print "Refreshed Games"
 
 
