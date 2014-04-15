@@ -22,6 +22,7 @@ In order to run this program from source you will need to have the following ins
 * Python 2.7
 * wxPython
 * Beautiful Soup
+* Requests
 
 TODO
 ----
