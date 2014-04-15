@@ -2,6 +2,8 @@ import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 import operator
 import gosuapi
+import time
+import threading
 
 
 class AutoWidthListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
@@ -9,6 +11,7 @@ class AutoWidthListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
         wx.ListCtrl.__init__(self, parent, -1,
                              style=wx.LC_REPORT | wx.SUNKEN_BORDER | wx.LC_HRULES | wx.LC_VRULES | wx.LC_SINGLE_SEL)
         ListCtrlAutoWidthMixin.__init__(self)
+
 
     def getSelectedIndices(self, state=wx.LIST_STATE_SELECTED):
         indices = []
@@ -25,6 +28,15 @@ class AutoWidthListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
                 lastFound = index
                 indices.append(index)
         return indices
+
+
+def list_refresh(function, interval):
+    previous_time = time.clock()
+    while True:
+        current_time = time.clock()
+        if current_time - previous_time > interval:
+            function()
+            previous_time = time.clock()
 
 
 class ListTeams(wx.Panel):
@@ -44,7 +56,10 @@ class ListTeams(wx.Panel):
         self.list.InsertColumn(2, "Country")
         self.list.InsertColumn(3, "Team Name")
         self.list.InsertColumn(4, "Status")
+
         self.populate_list()
+        #threading.Thread(target=list_refresh, args=(self.populate_list, 5)).start()
+
         self.list.Show(True)
 
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_select, self.list)
@@ -70,7 +85,6 @@ class ListTeams(wx.Panel):
 
     def populate_list(self):
         self.list.DeleteAllItems()
-
 
         if len(self.team_list) > 0:
             self.pinned_teams.sort(key=operator.itemgetter('irank'))

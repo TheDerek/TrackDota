@@ -8,11 +8,11 @@ def find_between(s, first, last):
     return re.search(first + r'(.*)' + last, s, re.DOTALL | re.MULTILINE).group(1)
 
 
-def get_teams():
+def get_teams(teams=[]):
     page = 0;
-    teams = []
+
     while True:
-        page += 1;
+        page += 1
         soup = BeautifulSoup(requests.get("http://www.gosugamers.net/dota2/rankings?page=" + str(page)).text)
 
 
@@ -34,12 +34,12 @@ def get_teams():
                 teams.reverse()
                 return teams
 
-def get_games(teams=get_teams()):
+def get_games(teams, games=[]):
     # Need to complete team names which end in ...
     # teams is an optional parameter as there is no need to load the teams twice
     page = 0
     nows = 0
-    games = []
+
     while True:
         page += 1
         soup = BeautifulSoup(requests.get("http://www.gosugamers.net/dota2/gosubet?u-page=" + str(page)).text)

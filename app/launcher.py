@@ -4,6 +4,8 @@
 import wx
 import listings
 import gosuapi
+import threading
+import multiprocessing
 
 
 def on_open(event):
@@ -12,6 +14,10 @@ def on_open(event):
 
 def on_exit(event):
     nb.CurrentPage.on_exit()
+
+def get_teams_games(teams, games):
+    gosuapi.get_teams(teams)
+    gosuapi.get_games(teams, games)
 
 if __name__ == "__main__":
     app = wx.App(False)
@@ -22,8 +28,10 @@ if __name__ == "__main__":
 
     pinned_teams = []
     pinned_games = []
-    teams = gosuapi.get_teams()
-    games = gosuapi.get_games(teams)
+    teams = []
+    games = []
+    threading.Thread(target=get_teams_games, args=(teams, games)).start()
+
 
     nb = wx.Notebook(frame)
     nb.AddPage(listings.ListTeams(nb, teams, games, pinned_teams), "All Teams")
