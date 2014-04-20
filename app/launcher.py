@@ -23,6 +23,7 @@ def get_teams_games(teams, games, pages):
     print "Games and teams got"
 
     for page in pages.values():
+        page.on_exit()
         page.refresh_data()
 
 
@@ -31,12 +32,21 @@ def get_games(teams, games, pages):
     gosuapi.get_games(teams, games)
     print "Games Got"
     for page in pages.values():
+        page.on_exit()
         page.refresh_data()
 
 
 def on_reload(event):
     threading.Thread(target=get_games, args=(teams, games, pages)).start()
 
+
+def on_revert(event):
+    del pinned_teams[0:len(pinned_teams)]
+    del pinned_games[0:len(pinned_games)]
+
+    for page in pages.values():
+        page.on_exit()
+        page.refresh_data()
 
 
 def on_quit(event):
@@ -57,6 +67,7 @@ if __name__ == "__main__":
     #Adding a toolbar
     toolbar = frame.CreateToolBar()
     refresh_tool = toolbar.AddLabelTool(wx.ID_REFRESH, 'Reload', wx.Bitmap('../assests/reload.png'))
+    revert_tool = toolbar.AddLabelTool(wx.ID_ANY, 'Revert', wx.Bitmap('../assests/revert.png'))
     quit_tool = toolbar.AddLabelTool(wx.ID_EXIT, 'Quit', wx.Bitmap('../assests/exit.png'))
     toolbar.Realize()
 
@@ -74,6 +85,7 @@ if __name__ == "__main__":
 
     frame.Bind(wx.EVT_TOOL, on_quit, quit_tool)
     frame.Bind(wx.EVT_TOOL, on_reload, refresh_tool)
+    frame.Bind(wx.EVT_TOOL, on_revert, revert_tool)
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, on_open)
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, on_exit)
 
