@@ -5,15 +5,42 @@ import wx
 import listings
 import gosuapi
 import threading
-import multiprocessing
+import pickle
+import os
 
+#TODO: ADD WAY TO UPDATE TIME ON PINNED GAMES
 
 def on_open(event):
     nb.CurrentPage.on_open()
 
 
+def on_quit(event):
+    frame.Close()
+
+
 def on_exit(event):
     nb.CurrentPage.on_exit()
+
+
+def on_save(event):
+    directory = "../saves"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    pickle.dump(pinned_teams, open("../saves/teams.p", "wb"))
+    pickle.dump(pinned_games, open("../saves/games.p", "wb"))
+
+
+def on_reload(event):
+        threading.Thread(target=get_games, args=(teams, games, pages)).start()
+
+
+def on_revert(event):
+    del pinned_teams[0:len(pinned_teams)]
+    del pinned_games[0:len(pinned_games)]
+
+    for page in pages.values():
+        page.on_exit()
+        page.refresh_data()
 
 
 def get_teams_games(teams, games, pages):
@@ -37,21 +64,6 @@ def get_games(teams, games, pages):
         page.refresh_data()
 
 
-def on_reload(event):
-    threading.Thread(target=get_games, args=(teams, games, pages)).start()
-
-
-def on_revert(event):
-    del pinned_teams[0:len(pinned_teams)]
-    del pinned_games[0:len(pinned_games)]
-
-    for page in pages.values():
-        page.on_exit()
-        page.refresh_data()
-
-
-def on_quit(event):
-    frame.Close()
 
 if __name__ == "__main__":
     app = wx.App(False)
@@ -69,6 +81,7 @@ if __name__ == "__main__":
     toolbar = frame.CreateToolBar()
     refresh_tool = toolbar.AddLabelTool(wx.ID_REFRESH, 'Reload', wx.Bitmap('../assests/reload.png'))
     revert_tool = toolbar.AddLabelTool(wx.ID_ANY, 'Revert', wx.Bitmap('../assests/revert.png'))
+    save_tool = toolbar.AddLabelTool(wx.ID_SAVE, 'Save', wx.Bitmap('../assests/save.png'))
     quit_tool = toolbar.AddLabelTool(wx.ID_EXIT, 'Quit', wx.Bitmap('../assests/exit.png'))
     toolbar.Realize()
 
@@ -87,6 +100,7 @@ if __name__ == "__main__":
     frame.Bind(wx.EVT_TOOL, on_quit, quit_tool)
     frame.Bind(wx.EVT_TOOL, on_reload, refresh_tool)
     frame.Bind(wx.EVT_TOOL, on_revert, revert_tool)
+    frame.Bind(wx.EVT_TOOL, on_save, save_tool)
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, on_open)
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, on_exit)
 
