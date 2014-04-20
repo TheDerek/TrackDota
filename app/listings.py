@@ -43,10 +43,11 @@ def list_refresh(function, interval=None, *args):
 
 
 class ListTeams(wx.Panel):
-    def __init__(self, parent, team_list, game_list, pinned_teams):
+    def __init__(self, parent, team_list, game_list, pinned_teams, pages):
         wx.Panel.__init__(self, parent)
 
         self.parent = parent
+        self.pages = pages
         self.team_list = team_list
         self.pinned_teams = pinned_teams
         self.game_list = game_list
@@ -131,11 +132,15 @@ class ListTeams(wx.Panel):
             self.list.SetStringItem(pos, 3, "Finding Teams")
             self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
+        self.set_scroll_pos(self.scroll_position)
+
     def on_open(self):
-        #self.populate_list()
+        if self.team_list == self.pinned_teams:
+            self.populate_list()
         self.set_scroll_pos(self.scroll_position)
 
     def on_exit(self):
+        wx.CallAfter(self.pages["games"].populate_list)
         self.scroll_position = self.get_scroll_pos()
 
     def get_scroll_pos(self):
@@ -155,7 +160,7 @@ class ListTeams(wx.Panel):
 
 
 class ListGames(wx.Panel):
-    def __init__(self, parent, team_list, game_list, pinned_games, pinned_teams):
+    def __init__(self, parent, team_list, game_list, pinned_games, pinned_teams, pages):
         wx.Panel.__init__(self, parent)
 
         self.parent = parent
@@ -163,6 +168,7 @@ class ListGames(wx.Panel):
         self.game_list = game_list
         self.pinned_games = pinned_games
         self.pinned_teams = pinned_teams
+        self.pages = pages
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.scroll_position = 0
 
@@ -236,8 +242,11 @@ class ListGames(wx.Panel):
             self.list.SetStringItem(pos, 2, "Finding Games")
             self.list.SetColumnWidth(2, wx.LIST_AUTOSIZE)
 
+        self.set_scroll_pos(self.scroll_position)
+
     def on_open(self):
-        #self.populate_list()
+        #if self.game_list == self.pinned_games:
+        wx.CallAfter(self.populate_list)
         self.set_scroll_pos(self.scroll_position)
 
     def on_exit(self):
@@ -258,12 +267,13 @@ class ListGames(wx.Panel):
             threading.Thread(target=self.refresh_games).start()
 
     def refresh_data(self):
-        print "Refreshing Games"
-        del self.game_list[0:len(self.game_list)]
+        if self.game_list != self.pinned_games:
+            print "Refreshing Games"
+            del self.game_list[0:len(self.game_list)]
 
-        gosuapi.get_games(self.team_list, self.game_list)
-        wx.CallAfter(self.populate_list)
-        wx.CallAfter(self.parent.SendPageChangedEvent, 0)
+            gosuapi.get_games(self.team_list, self.game_list)
+            wx.CallAfter(self.populate_list)
+            wx.CallAfter(self.parent.SendPageChangedEvent, 0)
         print "Refreshed Games"
 
 

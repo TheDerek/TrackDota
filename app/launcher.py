@@ -19,7 +19,7 @@ def get_teams_games(teams, games, pages):
     gosuapi.get_teams(teams)
     gosuapi.get_games(teams, games)
 
-    for page in pages:
+    for page in pages.values():
         page.refresh_data()
 
 
@@ -36,16 +36,18 @@ if __name__ == "__main__":
     games = []
 
     nb = wx.Notebook(frame)
-    pages = []
-    pages.append(listings.ListTeams(nb, teams, games, pinned_teams))
-    pages.append(listings.ListTeams(nb, pinned_teams, games, pinned_teams))
-    pages.append(listings.ListGames(nb, teams, games, pinned_games, pinned_teams))
-    pages.append(listings.ListGames(nb, teams, pinned_games, pinned_games, pinned_teams))
+    pages = {}
 
-    nb.AddPage(pages[0], "All Teams")
-    nb.AddPage(pages[1], "Pinned Teams")
-    nb.AddPage(pages[2], "Games")
-    nb.AddPage(pages[3], "Pinned Games")
+    pages["teams"] = listings.ListTeams(nb, teams, games, pinned_teams, pages)
+    pages["teams_pinned"] = listings.ListTeams(nb, pinned_teams, games, pinned_teams, pages)
+    pages["games"] = listings.ListGames(nb, teams, games, pinned_games, pinned_teams, pages)
+    pages["games_pinned"] = listings.ListGames(nb, teams, pinned_games, pinned_games, pinned_teams, pages)
+
+    nb.AddPage(pages["teams"], "All Teams")
+    nb.AddPage(pages["teams_pinned"], "Pinned Teams")
+    nb.AddPage(pages["games"], "Games")
+    nb.AddPage(pages["games_pinned"], "Pinned Games")
+
 
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, on_open)
     nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, on_exit)

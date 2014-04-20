@@ -8,6 +8,7 @@ def find_between(s, first, last):
     return re.search(first + r'(.*)' + last, s, re.DOTALL | re.MULTILINE).group(1)
 
 
+
 def get_teams(teams=[]):
     page = 0;
 
@@ -99,12 +100,12 @@ def get_team(name, teams):
             return team
 
 def get_next_match(team_name, teams, games):
-    games.reverse()
+    games.sort(key=operator.itemgetter('position'))
     for game in games:
         if (game["team1"] == team_name) | (game["team2"] == team_name):
             games.reverse()
             return game
-    games.reverse()
+
 
 
 
