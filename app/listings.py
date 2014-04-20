@@ -268,13 +268,13 @@ class ListGames(wx.Panel):
             threading.Thread(target=self.refresh_games).start()
 
     def refresh_data(self):
-        if self.game_list != self.pinned_games:
-            print "Refreshing Games"
-            #del self.game_list[0:len(self.game_list)]
 
-            #gosuapi.get_games(self.team_list, self.game_list)
-            wx.CallAfter(self.populate_list)
-            wx.CallAfter(self.parent.SendPageChangedEvent, 0)
+        print "Refreshing Games"
+        #del self.game_list[0:len(self.game_list)]
+
+        #gosuapi.get_games(self.team_list, self.game_list)
+        wx.CallAfter(self.populate_list)
+        wx.CallAfter(self.parent.SendPageChangedEvent, 0)
         print "Refreshed Games"
 
 

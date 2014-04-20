@@ -29,6 +29,7 @@ def get_teams_games(teams, games, pages):
 
 def get_games(teams, games, pages):
     print "Getting Games"
+    del games[0:len(games)]
     gosuapi.get_games(teams, games)
     print "Games Got"
     for page in pages.values():
