@@ -154,9 +154,10 @@ class ListTeams(wx.Panel):
         self.list.EnsureVisible((pos - 1))
 
     def refresh_data(self):
-            print "Refreshing"
+            print "Refreshing Team List"
             wx.CallAfter(self.populate_list)
             wx.CallAfter(self.parent.SendPageChangedEvent, 0)
+            print "Team list refreshed"
 
 
 class ListGames(wx.Panel):
@@ -269,9 +270,9 @@ class ListGames(wx.Panel):
     def refresh_data(self):
         if self.game_list != self.pinned_games:
             print "Refreshing Games"
-            del self.game_list[0:len(self.game_list)]
+            #del self.game_list[0:len(self.game_list)]
 
-            gosuapi.get_games(self.team_list, self.game_list)
+            #gosuapi.get_games(self.team_list, self.game_list)
             wx.CallAfter(self.populate_list)
             wx.CallAfter(self.parent.SendPageChangedEvent, 0)
         print "Refreshed Games"
