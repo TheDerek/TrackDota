@@ -55,7 +55,7 @@ class ListTeams(wx.Panel):
         self.scroll_position = 0
 
         self.list = AutoWidthListCtrl(self)
-        self.list.InsertColumn(0, "Following")
+        self.list.InsertColumn(0, "Pinned")
         self.list.InsertColumn(1, "Rank", format=wx.LIST_FORMAT_RIGHT)
         self.list.InsertColumn(2, "Country")
         self.list.InsertColumn(3, "Team Name")
@@ -86,7 +86,7 @@ class ListTeams(wx.Panel):
 
         else:
             self.pinned_teams.append(selected_team)
-            self.list.SetStringItem(row, 0, "Following")
+            self.list.SetStringItem(row, 0, "Pinned")
 
     def populate_list(self):
         self.list.DeleteAllItems()
@@ -99,7 +99,7 @@ class ListTeams(wx.Panel):
                 pinned = ""
 
                 if team in self.pinned_teams:
-                    pinned = "Following"
+                    pinned = "Pinned"
 
                 pos = self.list.InsertStringItem(0, pinned)
                 self.list.SetStringItem(pos, 1, team["rank"])
@@ -173,7 +173,7 @@ class ListGames(wx.Panel):
         self.scroll_position = 0
 
         self.list = AutoWidthListCtrl(self)
-        self.list.InsertColumn(0, "Following")
+        self.list.InsertColumn(0, "Pinned")
         self.list.InsertColumn(1, "Time")
         self.list.InsertColumn(2, "Team 1")
         self.list.InsertColumn(3, "     ", format=wx.LIST_FORMAT_CENTRE) # for the "Vs."
@@ -201,7 +201,7 @@ class ListGames(wx.Panel):
 
         else:
             self.pinned_games.append(selected_game)
-            self.list.SetStringItem(row, 0, "Following")
+            self.list.SetStringItem(row, 0, "Pinned")
 
     def populate_list(self):
         self.list.DeleteAllItems()
@@ -223,7 +223,7 @@ class ListGames(wx.Panel):
                         self.pinned_games.append(game)
 
                 if game in self.pinned_games:
-                    pinned = "Following"
+                    pinned = "Pinned"
 
                 pos = self.list.InsertStringItem(0, pinned)
                 self.list.SetStringItem(pos, 1, game["time"])
